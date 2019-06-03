@@ -1,0 +1,10 @@
+# An invisible cube
+# Created by Emmanuel PUYBARET / eTeks <info@eteks.com>
+# Published in public domain. 
+g Cube
+v 0.0 0.0 0.0
+v 1.0 0.0 0.0
+v 1.0 1.0 1.0
+v 0.0 1.0 1.0
+f 1 2 1
+f 3 4 3
