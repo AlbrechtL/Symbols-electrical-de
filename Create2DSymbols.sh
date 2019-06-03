@@ -10,8 +10,8 @@ echo "# Requires ImageMagick and zip"  >> $ff
 echo "# Attention:"  >> $ff
 echo "# The script resizes (to 256x256, but keeping proportions) the original images and copy the result"  >> $ff
 echo "# in catalog folder (if ImageMagick is installed)." >> $ff
-echo "# The resulting library is zipped and moved (overwriting files with the same name) to ~/.eteks/sweethome3d/furniture/"  >> $ff
-echo "# Upon restart of SweetHome3D, the library is available. Alternatively, import it from ~/.eteks/sweethome3d/furniture/"  >> $ff
+echo "# The resulting library is zipped and moved (overwriting files with the same name) to ../"  >> $ff
+echo "# Upon restart of SweetHome3D, the library is available. Alternatively, import it from ../"  >> $ff
 echo "# The file name without file type suffix will be used as the symbol name: "  >> $ff
 #echo "# The filename should have the synthax: SymbolName.Information.png"  >> $ff
 echo "# Alphabetical order following the file names."  >> $ff
@@ -20,9 +20,9 @@ echo -en '\n\n' >> $ff
 echo "id=SweetHome3D#2DSymbols"  >> $ff
 echo "name=2DSymbols"  >> $ff
 echo "description= Symbols Catalog for use in 2D plan"  >> $ff
-echo "version=1.5.5"  >> $ff
+echo "version=1.5.6"  >> $ff
 echo "license=GPL-3.0"  >> $ff
-echo "provider=dorin"  >> $ff
+echo "provider=AlbrechtL (based on dorin)"  >> $ff
 echo -en '\n\n' >> $ff
 
 cnt=0
@@ -36,8 +36,8 @@ cp plan/$nn catalog/
 cn=catalog/$nn
 pn=plan/$nn
  echo $nn
- { width=`convert "$pn" -format '%w' info:`
-   depth=`convert "$pn" -format '%h' info:`
+ { width=$[`convert "$pn" -format '%w' info:` / 20]
+   depth=$[`convert "$pn" -format '%h' info:` / 20]
    convert -trim "$cn" "$cn"
    convert "$cn" -resize 256x256 -background transparent -gravity center -extent 256x256 "$cn"
  } || {
@@ -72,7 +72,7 @@ done
 IFS=$OIFS
 
 mylib=${PWD##*/}.sh3f
-zip -r $mylib .
-mv $mylib ~/.eteks/sweethome3d/furniture/
+zip -r $mylib . -x *.git*
+mv $mylib ../
 
 
