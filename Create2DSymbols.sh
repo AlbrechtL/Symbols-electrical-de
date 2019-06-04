@@ -20,7 +20,7 @@ echo -en '\n\n' >> $ff
 echo "id=SweetHome3D#2DSymbols"  >> $ff
 echo "name=2DSymbols"  >> $ff
 echo "description= Symbols Catalog for use in 2D plan"  >> $ff
-echo "version=1.5.6"  >> $ff
+echo "version=1.5.7"  >> $ff
 echo "license=GPL-3.0"  >> $ff
 echo "provider=AlbrechtL (based on dorin)"  >> $ff
 echo -en '\n\n' >> $ff
@@ -36,8 +36,10 @@ cp plan/$nn catalog/
 cn=catalog/$nn
 pn=plan/$nn
  echo $nn
- { width=$[`convert "$pn" -format '%w' info:` / 20]
-   depth=$[`convert "$pn" -format '%h' info:` / 20]
+ { widthOrig=`convert "$pn" -format '%w' info:`
+   depthOrig=`convert "$pn" -format '%h' info:`
+   width=$[$widthOrig / 20]
+   depth=$[$depthOrig / 20]
    convert -trim "$cn" "$cn"
    convert "$cn" -resize 256x256 -background transparent -gravity center -extent 256x256 "$cn"
  } || {
@@ -57,15 +59,28 @@ cnt=`expr $cnt + 1`
  echo category#$cnt="Symbols-electrical-de" >> $ff
  echo icon#$cnt=/$cn >> $ff
  echo planIcon#$cnt=/$pn >> $ff
- echo model#$cnt=/invisibleCube.obj >> $ff
+ echo model#$cnt=/models/$name.obj >> $ff
  echo width#$cnt=$width >> $ff
  echo depth#$cnt=$depth >> $ff
- echo height#$cnt=10.0 >> $ff
+ echo height#$cnt=$depth >> $ff
  echo elevation#$cnt=50.0 >> $ff
  echo movable#$cnt=true >> $ff
  echo doorOrWindow#$cnt=false >> $ff
  echo creator#$cnt=dorin >> $ff
  echo -en '\n\n' >> $ff
+
+ # extent image to make it smaller inside the 3D view
+ cp plan/$nn models/
+ convert models/"$nn" -gravity center -background white -extent $[$widthOrig * 2]x$[$depthOrig * 2] models/"$nn"
+ convert models/"$nn" -resize "$widthOrig"x"$depthOrig"! models/"$nn"
+
+ # create the OBJ and MTL file
+ cp cube.obj.template models/$name.obj
+ cp cube.mtl.template models/$name.mtl
+
+ # replace magic keys
+ sed -i -e 's/%%MTL_FILE_NAME%%/'"$name"'.mtl/g' models/$name.obj
+ sed -i -e 's/%%IMAGE_FILE_NAME%%/'"$name"'.png/g' models/$name.mtl
  }
 done
 
