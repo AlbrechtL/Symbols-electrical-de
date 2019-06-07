@@ -32,16 +32,22 @@ IFS=$'\n'
 for nn in  `ls plan | sort -V`
 do
 {
-cp plan/$nn catalog/
+cp originals/$nn catalog/
+cp originals/$nn plan/
 cn=catalog/$nn
 pn=plan/$nn
  echo $nn
  { widthOrig=`convert "$pn" -format '%w' info:`
    depthOrig=`convert "$pn" -format '%h' info:`
-   width=$[$widthOrig / 20]
-   depth=$[$depthOrig / 20]
+   width=$[$widthOrig / 13]
+   depth=$[$depthOrig / 13]
+
+   # resize catalog icons
    convert -trim "$cn" "$cn"
    convert "$cn" -resize 256x256 -background transparent -gravity center -extent 256x256 "$cn"
+
+   # make plan icons red
+   convert "$pn" -fuzz 50% -fill firebrick3 -opaque black "$pn"
  } || {
   echo "Cannot find convert, a member of the ImageMagick suite. The images are not cropped and resized to 256x256."
   echo -en '\n\n' >> $ff
@@ -59,7 +65,8 @@ cnt=`expr $cnt + 1`
  echo category#$cnt="Symbols-electrical-de" >> $ff
  echo icon#$cnt=/$cn >> $ff
  echo planIcon#$cnt=/$pn >> $ff
- echo model#$cnt=/models/$name.obj >> $ff
+# echo model#$cnt=/models/$name.obj >> $ff
+ echo model#$cnt=/invisibleCube.obj >> $ff
  echo width#$cnt=$width >> $ff
  echo depth#$cnt=$depth >> $ff
  echo height#$cnt=$depth >> $ff
@@ -69,18 +76,19 @@ cnt=`expr $cnt + 1`
  echo creator#$cnt=dorin >> $ff
  echo -en '\n\n' >> $ff
 
+ # Try to display 2D symbols inside the 3D view
  # extent image to make it smaller inside the 3D view
- cp plan/$nn models/
- convert models/"$nn" -gravity center -background white -extent $[$widthOrig * 2]x$[$depthOrig * 2] models/"$nn"
- convert models/"$nn" -resize "$widthOrig"x"$depthOrig"! models/"$nn"
+# cp plan/$nn models/
+# convert models/"$nn" -gravity center -background white -extent $[$widthOrig * 2]x$[$depthOrig * 2] models/"$nn"
+# convert models/"$nn" -resize "$widthOrig"x"$depthOrig"! models/"$nn"
 
  # create the OBJ and MTL file
- cp cube.obj.template models/$name.obj
- cp cube.mtl.template models/$name.mtl
+# cp cube.obj.template models/$name.obj
+# cp cube.mtl.template models/$name.mtl
 
- # replace magic keys
- sed -i -e 's/%%MTL_FILE_NAME%%/'"$name"'.mtl/g' models/$name.obj
- sed -i -e 's/%%IMAGE_FILE_NAME%%/'"$name"'.png/g' models/$name.mtl
+# # replace magic keys
+# sed -i -e 's/%%MTL_FILE_NAME%%/'"$name"'.mtl/g' models/$name.obj
+# sed -i -e 's/%%IMAGE_FILE_NAME%%/'"$name"'.png/g' models/$name.mtl
  }
 done
 
